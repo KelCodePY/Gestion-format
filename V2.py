@@ -1,3 +1,4 @@
+import os
 import logging
 import asyncio
 from aiogram import Bot, Dispatcher, Router
