@@ -6,7 +6,7 @@ from flask import Flask
 import threading
 
 # Configuration du bot
-API_TOKEN = "Ton token Telegram"  # Remplace par ton token Telegram
+API_TOKEN = "token_Telegram"  # Remplace par ton token Telegram
 bot = Bot(token=API_TOKEN)
 
 # Dispatcher et Router
