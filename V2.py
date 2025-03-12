@@ -23,14 +23,10 @@ dp.include_router(router)  # Ajout du routeur dans le Dispatcher
 @router.message()
 async def handle_media_message(message: Message):
     try:
-        # Vérifier si le message contient une vidéo ou une image
         if message.video or message.photo:
             await message.delete()
-            
-            # Texte formaté
             formatted_text = "Titre -\nGenre -"
-            
-            # Envoyer le nouveau message avec la vidéo ou l'image
+
             if message.video:
                 await message.answer_video(video=message.video.file_id, caption=formatted_text)
             elif message.photo:
@@ -47,19 +43,28 @@ def home():
     return "✅ Le bot Telegram est en cours d'exécution."
 
 def run_flask():
-    port = int(os.getenv("PORT", 6045))  # Port dynamique fourni par Render
-    app.run(host='0.0.0.0', port=port)
+    try:
+        port = int(os.getenv("PORT", 6045))  # Port dynamique fourni par Render
+        app.run(host='0.0.0.0', port=port)
+    except Exception as e:
+        logging.error(f"❌ Erreur lors du démarrage de Flask : {e}")
 
 async def on_startup():
     await bot.delete_webhook(drop_pending_updates=True)
 
 async def main():
-    await on_startup()
-    logging.info("✅ Bot Telegram lancé avec succès !")
-    await dp.start_polling(bot)
+    try:
+        await on_startup()
+        logging.info("✅ Bot Telegram lancé avec succès !")
+        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+    except Exception as e:
+        logging.error(f"❌ Erreur dans l'exécution du bot : {e}")
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
     # Démarrer Flask dans un thread
     threading.Thread(target=run_flask, daemon=True).start()
